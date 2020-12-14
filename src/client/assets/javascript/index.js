@@ -61,7 +61,7 @@ function setupClickHandlers() {
 
       // Handle acceleration click
       if (target.matches('#gas-peddle')) {
-        handleAccelerate(target);
+        handleAccelerate();
       }
     },
     false
@@ -114,7 +114,6 @@ function runRace(raceID) {
     // TODO - use Javascript's built in setInterval method to get race info every 500ms
     const raceInterval = setInterval(() => {
       getRace(raceID).then((res) => {
-        console.log(res);
         switch (res.status) {
           // TODO - if the race info status property is "in-progress", update the leaderboard by calling:
           case 'in-progress':
@@ -198,7 +197,8 @@ function handleSelectTrack(target) {
 
 function handleAccelerate() {
   console.log('accelerate button clicked');
-  accelerate(store.player_id);
+  // TODO - Invoke the API call to accelerate
+  accelerate(store.race_id);
 }
 
 // HTML VIEWS ------------------------------------------------
@@ -301,7 +301,10 @@ function resultsView(positions) {
 }
 
 function raceProgress(positions) {
-  let userPlayer = positions.find((e) => parseInt(e.id) === parseInt(store.player_id));
+  let userPlayer = positions.find((e) => {
+    return e.id === parseInt(store.player_id);
+  });
+
   userPlayer.driver_name += ' (you)';
 
   positions = positions.sort((a, b) => (a.segment > b.segment ? -1 : 1));
@@ -397,7 +400,6 @@ function startRace(id) {
 }
 
 function accelerate(id) {
-  console.log('called');
   // POST request to `${SERVER}/api/races/${id}/accelerate`
   // options parameter provided as defaultFetchOpts
   // no body or datatype needed for this request
