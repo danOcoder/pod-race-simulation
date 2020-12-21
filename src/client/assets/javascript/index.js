@@ -4,12 +4,8 @@
 var store = {
   track_id: undefined,
   player_id: undefined,
-  race_id: undefined
-};
-
-// Updates store
-const updateStore = (newState = {}) => {
-  store = { ...store, ...newState };
+  race_id: undefined,
+  timer_complete: false
 };
 
 // We need our javascript to wait until the DOM is loaded
@@ -78,6 +74,11 @@ async function delay(ms) {
 }
 // ^ PROVIDED CODE ^ DO NOT REMOVE
 
+// Updates store
+const updateStore = (newState = {}) => {
+  store = { ...store, ...newState };
+};
+
 // This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
   // TODO - Get player_id and track_id from the store
@@ -96,6 +97,7 @@ async function handleCreateRace() {
     updateStore({ race_id: raceId });
 
     // The race has been created, now start the countdown
+
     // TODO - call the async function runCountdown
     await runCountdown();
 
@@ -121,6 +123,7 @@ function runRace(raceID) {
             break;
           // TODO - if the race info status property is "finished", run the following:
           case 'finished':
+            updateStore({ timer_complete: false });
             // to stop the interval from repeating
             clearInterval(raceInterval);
             // to render the results view
@@ -152,6 +155,7 @@ async function runCountdown() {
         document.getElementById('big-numbers').innerHTML = --timer;
         // TODO - if the countdown is done, clear the interval, resolve the promise, and return
         if (!timer) {
+          updateStore({ timer_complete: true });
           clearInterval(countDown);
           resolve();
           return;
@@ -196,9 +200,11 @@ function handleSelectTrack(target) {
 }
 
 function handleAccelerate() {
-  console.log('accelerate button clicked');
   // TODO - Invoke the API call to accelerate
-  accelerate(store.race_id);
+  if (store.timer_complete) {
+    console.log('accelerate button clicked');
+    accelerate(store.race_id);
+  }
 }
 
 // HTML VIEWS ------------------------------------------------
